@@ -1,0 +1,12 @@
+{
+  "name": "mlb-scraper",
+  "version": "1.0.0",
+  "description": "Scrape MLB Watch links",
+  "main": "scrape.js",
+  "scripts": {
+    "scrape": "node scrape.js"
+  },
+  "dependencies": {
+    "puppeteer": "^20.0.0"
+  }
+}
