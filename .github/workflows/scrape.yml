@@ -1,7 +1,5 @@
-# .github/workflows/scrape.yml
 name: scrape
 
-# Run on a 5-minute schedule, plus allow manual dispatch
 on:
   schedule:
     - cron: '*/5 * * * *'
@@ -12,28 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Check out your repository
       - name: Check out code
         uses: actions/checkout@v4
 
-      # 2) Set up Node.js 18.x
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # 3) Install dependencies from package.json
       - name: Install dependencies
         run: npm install
 
-      # 4) Run the scraper
       - name: Run scraper
         run: npm run scrape
 
-      # 5) Persist the output file as an artifact
       - name: Upload WATCH_LINKS.json
         if: always()
-        uses: actions/upload-artifact@v3
+-       uses: actions/upload-artifact@v3
++       uses: actions/upload-artifact@v4
         with:
           name: watch-links
           path: WATCH_LINKS.json
