@@ -1,0 +1,35 @@
+# .github/workflows/scrape.yml
+name: 🏟️ Scrape MLB Stream Links
+
+on:
+  schedule:
+    # every day at 12:05am UTC (just once/day; you can add other triggers)
+    - cron: '5 0 * * *'
+  workflow_dispatch:  # also allow manual runs
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo  
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js  
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Puppeteer  
+        run: |
+          npm init -y
+          npm install puppeteer@21
+
+      - name: Run scraper  
+        run: node index.js
+
+      - name: Commit results  
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore: update MLB WATCH_LINKS.json"
+          file_pattern: 'WATCH_LINKS.json'
