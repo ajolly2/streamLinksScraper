@@ -1,35 +1,32 @@
 // index.js
 const fs = require('fs');
-const path = require('path');
 const puppeteer = require('puppeteer');
 
 (async () => {
-  const url = 'https://www.mlb.com/live-stream-games';
-  const browser = await puppeteer.launch();
-  const page    = await browser.newPage();
-  await page.goto(url, { waitUntil: 'networkidle2' });
+  // 1) Launch browser with no-sandbox flags for CI
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
 
-  // Wait for the Live Games table
-  await page.waitForSelector('section.MlbTvLiveGames table');
+  try {
+    // 2) Open a new page and go to the MLB scores page
+    const page = await browser.newPage();
+    await page.goto('https://www.mlb.com/scores', { waitUntil: 'networkidle2' });
 
-  const games = await page.$$eval(
-    'section.MlbTvLiveGames table tbody tr',
-    rows => rows.map(r => {
-      const tds = r.querySelectorAll('td');
-      const timeCell   = tds[0]?.innerText.trim()    || '';
-      const matchup    = tds[1]?.innerText.trim()    || '';
-      const streamCell = tds[2];
-      // grab first link in the MLB.TV cell
-      const linkEl = streamCell ? streamCell.querySelector('a[href*="/tv/"]') : null;
-      const streamUrl = linkEl ? linkEl.href : '';
-      return { time: timeCell, matchup, streamUrl };
-    })
-  );
+    // 3) Extract all "Watch" links
+    const watchLinks = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('a'))
+        .filter(a => a.textContent.trim() === 'Watch')
+        .map(a => a.href);
+    });
 
-  await browser.close();
-
-  // write out json
-  const out = path.resolve(process.cwd(), 'WATCH_LINKS.json');
-  fs.writeFileSync(out, JSON.stringify(games, null, 2));
-  console.log(`→ Wrote ${games.length} games to ${out}`);
+    // 4) Write the results to WATCH_LINKS.json
+    fs.writeFileSync('WATCH_LINKS.json', JSON.stringify(watchLinks, null, 2));
+    console.log(`✅ Found ${watchLinks.length} watch link(s).`);
+  } catch (err) {
+    console.error('❌ Error during scrape:', err);
+    process.exitCode = 1;
+  } finally {
+    await browser.close();
+  }
 })();
