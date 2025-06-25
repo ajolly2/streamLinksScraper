@@ -1,12 +1,16 @@
 {
-  "name": "mlb-scraper",
+  "name": "stream-links-scraper",
   "version": "1.0.0",
-  "description": "Scrape MLB Watch links",
-  "main": "scrape.js",
+  "description": "Scrape MLB.com scores page for Watch links",
+  "main": "index.js",
   "scripts": {
-    "scrape": "node scrape.js"
+    "scrape": "node index.js"
   },
   "dependencies": {
-    "puppeteer": "^20.0.0"
-  }
+    "puppeteer": "^21.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
 }
