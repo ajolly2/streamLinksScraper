@@ -2,8 +2,8 @@ name: scrape
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch:
+    - cron: '*/5 * * * *'      # every 5 minutes
+  workflow_dispatch:           # manual trigger
 
 jobs:
   scrape-stream-links:
@@ -13,10 +13,10 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
@@ -26,8 +26,7 @@ jobs:
 
       - name: Upload WATCH_LINKS.json
         if: always()
--       uses: actions/upload-artifact@v3
-+       uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4
         with:
           name: watch-links
           path: WATCH_LINKS.json
